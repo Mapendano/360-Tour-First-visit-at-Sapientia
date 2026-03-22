@@ -177,7 +177,33 @@
   controls.registerMethod('rightElement', new Marzipano.ElementPressControlMethod(viewRightElement,  'x',  velocity, friction), true);
   controls.registerMethod('inElement',    new Marzipano.ElementPressControlMethod(viewInElement,  'zoom', -velocity, friction), true);
   controls.registerMethod('outElement',   new Marzipano.ElementPressControlMethod(viewOutElement, 'zoom',  velocity, friction), true);
+// --- AJOUT DU GYROSCOPE ---
+  var deviceOrientationControlMethod = new DeviceOrientationControlMethod();
+  controls.addMethod('deviceOrientation', deviceOrientationControlMethod);
 
+  var gyroButton = document.getElementById('gyro-button');
+
+  if (gyroButton) {
+    gyroButton.addEventListener('click', function() {
+      // Permission pour iOS
+      if (typeof DeviceOrientationEvent !== 'undefined' && 
+          typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission()
+          .then(function(state) {
+            if (state === 'granted') {
+              controls.enableMethod('deviceOrientation');
+              gyroButton.style.display = 'none';
+            }
+          })
+          .catch(console.error);
+      } else {
+        // Pour Android
+        controls.enableMethod('deviceOrientation');
+        gyroButton.style.display = 'none';
+      }
+    });
+  }
+  // --------------------------
   function sanitize(s) {
     return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;');
   }
