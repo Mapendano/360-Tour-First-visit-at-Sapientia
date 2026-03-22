@@ -185,7 +185,12 @@
 
   if (gyroButton) {
     gyroButton.addEventListener('click', function() {
-      // Permission pour iOS
+      // FORCE LE RÉVEIL DU CAPTEUR (Essentiel sur Android/Chrome récent)
+      if (typeof deviceOrientationControlMethod.getDeviceOrientation === 'function') {
+        deviceOrientationControlMethod.getDeviceOrientation();
+      }
+
+      // GESTION PERMISSION iOS (iPhone)
       if (typeof DeviceOrientationEvent !== 'undefined' && 
           typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission()
@@ -197,13 +202,13 @@
           })
           .catch(console.error);
       } else {
-        // Pour Android
+        // POUR ANDROID ET AUTRES
         controls.enableMethod('deviceOrientation');
         gyroButton.style.display = 'none';
       }
     });
   }
-  // --------------------------
+  // --------------------------              
   function sanitize(s) {
     return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;');
   }
